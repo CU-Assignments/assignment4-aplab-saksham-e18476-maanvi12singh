@@ -1,0 +1,43 @@
+import java.util.*;
+
+public class Solution {
+    public int[] beautifulArray(int n) {
+        return beautifulArrayHelper(n);
+    }
+
+    private int[] beautifulArrayHelper(int n) {
+        if (n == 1) {
+            return new int[]{1};  // Base case: if n is 1, the array is just [1]
+        }
+        
+        List<Integer> odd = new ArrayList<>();
+        List<Integer> even = new ArrayList<>();
+        
+        // Split into odd and even numbers recursively
+        for (int num : beautifulArrayHelper((n + 1) / 2)) {
+            odd.add(2 * num - 1);  // Map to odd numbers
+        }
+        for (int num : beautifulArrayHelper(n / 2)) {
+            even.add(2 * num);  // Map to even numbers
+        }
+
+        // Combine the odd and even numbers
+        List<Integer> result = new ArrayList<>();
+        result.addAll(odd);
+        result.addAll(even);
+
+        // Convert the result list to an array and return
+        return result.stream().mapToInt(i -> i).toArray();
+    }
+
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        
+        // Test cases
+        int n1 = 4;
+        System.out.println(Arrays.toString(solution.beautifulArray(n1)));  // Output could be [2, 1, 4, 3]
+
+        int n2 = 5;
+        System.out.println(Arrays.toString(solution.beautifulArray(n2)));  // Output could be [3, 1, 2, 5, 4]
+    }
+}
