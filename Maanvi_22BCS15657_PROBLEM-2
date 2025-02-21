@@ -1,0 +1,67 @@
+import java.util.*;
+
+public class Solution {
+    public List<List<Integer>> getSkyline(int[][] buildings) {
+        // Step 1: Create a list of events
+        List<int[]> events = new ArrayList<>();
+        
+        // Convert the buildings into events
+        for (int[] building : buildings) {
+            // Add a start event (height, x, type)
+            events.add(new int[]{building[0], building[2], 1});
+            // Add an end event (height, x, type)
+            events.add(new int[]{building[1], building[2], -1});
+        }
+        
+        // Step 2: Sort the events
+        // Sort by x, and if x is the same, process start events before end events
+        events.sort((a, b) -> {
+            if (a[0] != b[0]) {
+                return a[0] - b[0];
+            }
+            return b[2] - a[2]; // For tie breaking: process start events first
+        });
+        
+        // Step 3: Process the events
+        List<List<Integer>> result = new ArrayList<>();
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());
+        maxHeap.add(0); // Add a ground level initially
+        int prevMaxHeight = 0;
+        
+        for (int[] event : events) {
+            int x = event[0];
+            int height = event[1];
+            int type = event[2];
+            
+            if (type == 1) { // Start of a building
+                maxHeap.add(height);
+            } else { // End of a building
+                maxHeap.remove(height);
+            }
+            
+            int currentMaxHeight = maxHeap.peek();
+            
+            // If the max height has changed, we need to add a new key point
+            if (currentMaxHeight != prevMaxHeight) {
+                result.add(Arrays.asList(x, currentMaxHeight));
+                prevMaxHeight = currentMaxHeight;
+            }
+        }
+        
+        return result;
+    }
+
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+        
+        // Test case 1
+        int[][] buildings1 = {{2, 9, 10}, {3, 7, 15}, {5, 12, 12}};
+        List<List<Integer>> result1 = solution.getSkyline(buildings1);
+        System.out.println(result1); // Expected output: [[2, 10], [3, 15], [7, 12], [12, 0], [9, 10]]
+        
+        // Test case 2
+        int[][] buildings2 = {{0, 2, 3}, {2, 5, 3}};
+        List<List<Integer>> result2 = solution.getSkyline(buildings2);
+        System.out.println(result2); // Expected output: [[0, 3], [5, 0]]
+    }
+}
